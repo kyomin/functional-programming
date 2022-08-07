@@ -1,0 +1,78 @@
+<script>
+	const log = console.log;
+</script>
+
+<!--  
+# Array를 통해 알아보기
+-->
+<script>
+	log('Arr ----------------');
+	const arr = [1, 2, 3]; // arr은 이터러블
+	let iter1 = arr[Symbol.iterator](); // arr의 이터레이터 추출
+	log(iter1.next());
+	for (const a of iter1) log(a); // for...of를 통해 순회할 수 있다.
+</script>
+
+<!--  
+# Set을 통해 알아보기
+-->
+<script>
+	log('Set ----------------');
+	const set = new Set([1, 2, 3]);
+	for (const a of set) log(a);
+</script>
+
+<!--  
+# Map을 통해 알아보기
+-->
+<script>
+	log('Map ----------------');
+	const map = new Map([
+		['a', 1],
+		['b', 2],
+		['c', 3],
+	]);
+	for (const a of map) log(a);
+</script>
+
+<!--  
+# 이터러블/이터레이터 프로토콜
+  - 이터러블: 이터레이터를 리턴하는 [Symbol.iterator]()를 가진 값
+  - 이터레이터: { value, done } 객체를 리턴하는 next()를 가진 값
+  - 이터러블/이터레이터 프로토콜: 이터러블을 for...of, 전개 연산자 등과 함께 동작하도록 한 규약
+-->
+
+<!-- ### 사용자 정의 이터러블을 통해 알아보기 -->
+<script>
+	log('사용자 정의 이터러블 ----------------');
+	const iterable = {
+		[Symbol.iterator]() {
+			let i = 3;
+			return {
+				next() {
+					return i === 0 ? { done: true } : { value: i--, done: false };
+				},
+				[Symbol.iterator]() {
+					return this;
+				},
+			};
+		},
+	};
+
+	let iterator = iterable[Symbol.iterator]();
+	// log(iterator.next());
+	// log(iterator.next());
+	// log(iterator.next());
+	// log(iterator.next());
+	for (const a of iterator) log(a);
+</script>
+
+<!-- ## 전개 연산자 -->
+<script>
+	log('전개 연산자 ----------------');
+	const a = [1, 2];
+	// 아래 구문 추가 시 "a is not iterable" 에러 발생
+	// a[Symbol.iterator] = null;
+	// 즉, 이터레이터가 구현되어 있는 것들에 전개 연산자를 적용할 수 있다.
+	log([...a, ...arr, ...set, ...map]);
+</script>
