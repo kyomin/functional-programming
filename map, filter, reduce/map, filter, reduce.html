@@ -1,6 +1,5 @@
-<script>
-	const log = console.log;
-</script>
+<script src="./map, filter, reduce.js"></script>
+
 <script>
 	const products = [
 		{ name: '반팔티', price: 15000 },
@@ -9,151 +8,16 @@
 		{ name: '후드티', price: 30000 },
 		{ name: '바지', price: 25000 },
 	];
-</script>
 
-<!-- map -->
-<script>
-	const map = (f, iter) => {
-		let res = [];
-		for (const a of iter) {
-			res.push(f(a));
-		}
-		return res;
-	};
-
-	/* name 속성만을 추출하여 새로운 배열 만들기 */
-	// 기존
-	let names = [];
-	for (const p of products) {
-		names.push(p.name);
-	}
-	log(names);
-
-	// map 함수 이용
-	log(map((p) => p.name, products));
-
-	/* price 속성만을 추출하여 새로운 배열 만들기 */
-	// 기존
-	let prices = [];
-	for (const p of products) {
-		prices.push(p.price);
-	}
-	log(prices);
-
-	// map 함수 이용
-	log(map((p) => p.price, products));
-</script>
-
-<!-- 이터러블 프로토콜을 따른 map의 다형성 -->
-<script>
-	// Error!
-	// NodeList 객체에는 map 함수가 구현되어 있지 않기 때문이다.
-	// log(document.querySelectorAll('*').map((el) => el.nodeName));
-
-	// 하지만 위에서 우리가 정의한 map 함수로는 동작이 잘 된다.
-	// 왜냐하면 NodeList 객체는 이터러블 프로토콜을 따르고 있기 때문이다.
-	log(map((el) => el.nodeName, document.querySelectorAll('*')));
-	const it = document.querySelectorAll('*')[Symbol.iterator]();
-	log(it.next());
-	log(it.next());
-	log(it.next());
-	log(it.next());
-	log(it.next());
-
-	// 제너레이터도 이터레이터이기 때문에 우리가 정의한 map 함수에서 잘 동작한다.
-	function* gen() {
-		yield 2;
-		yield 3;
-		yield 4;
-	}
-	log(map((a) => a * a, gen()));
-
-	let m = new Map();
-	m.set('a', 10);
-	m.set('b', 20);
-	const it2 = m[Symbol.iterator]();
-	log(it2.next());
-	log(it2.next());
-	log(it2.next());
-
-	// Map 자료구조는 value가 배열이기 때문에 구조분해로 넘길 수 있다.
-	log(new Map(map(([k, v]) => [k, v * 2], m)));
-</script>
-
-<!-- filter -->
-<script>
-	const filter = (f, iter) => {
-		let res = [];
-		for (const a of iter) {
-			if (f(a)) res.push(a);
-		}
-		return res;
-	};
-
-	/* 20000원 미만인 가격 조건을 가진 것만 추출하여 새로운 배열 만들기 */
-	// 기존
-	let under20000 = [];
-	for (const p of products) {
-		if (p.price < 20000) under20000.push(p);
-	}
-	log(...under20000);
-
-	// filter 함수 이용
-	log(...filter((p) => p.price < 20000, products));
-
-	/* 20000원 이상인 가격 조건을 가진 것만 추출하여 새로운 배열 만들기 */
-	// 기존
-	let over20000 = [];
-	for (const p of products) {
-		if (p.price >= 20000) over20000.push(p);
-	}
-	log(...over20000);
-
-	// filter 함수 이용
-	log(...filter((p) => p.price >= 20000, products));
-
-	// 다음과 같이 Array 및 제너레이터에 응용될 수 있음
-	log(filter((n) => n % 2, [1, 2, 3, 4]));
-
-	log(
-		filter(
-			(n) => n % 2,
-			(function* () {
-				yield 1;
-				yield 2;
-				yield 3;
-				yield 4;
-				yield 5;
-			})()
-		)
-	);
-</script>
-
-<!-- reduce -->
-<script>
-	const nums = [1, 2, 3, 4, 5];
-
-	// acc에 값을 누적해 나가며, 누적 기준은 f에 위임한다.
-	const reduce = (f, acc, iter) => {
-		// acc를 사용자가 넘기지 않았을 때의 처리
-		if (!iter) {
-			iter = acc[Symbol.iterator]();
-			acc = iter.next().value;
-		}
-
-		for (const a of iter) {
-			acc = f(acc, a);
-		}
-		return acc;
-	};
-
+  // 가격이 20000원 미만인 상품들의 가격을 합산한다.
 	const add = (a, b) => a + b;
-	log(reduce(add, 0, nums));
-	log(reduce(add, nums));
-</script>
-<script>
-	// 위에서 정의한 redece를 products 배열에 응용
 	log(
-		reduce((total_price, product) => total_price + product.price, 0, products)
+		reduce(
+			add,
+			map(
+				(p) => p.price,
+				filter((p) => p.price < 20000, products)
+			)
+		)
 	);
 </script>
