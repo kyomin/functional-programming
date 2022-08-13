@@ -79,3 +79,52 @@
 	// Map 자료구조는 value가 배열이기 때문에 구조분해로 넘길 수 있다.
 	log(new Map(map(([k, v]) => [k, v * 2], m)));
 </script>
+
+<!-- filter -->
+<script>
+	const filter = (f, iter) => {
+		let res = [];
+		for (const a of iter) {
+			if (f(a)) res.push(a);
+		}
+		return res;
+	};
+
+	/* 20000원 미만인 가격 조건을 가진 것만 추출하여 새로운 배열 만들기 */
+	// 기존
+	let under20000 = [];
+	for (const p of products) {
+		if (p.price < 20000) under20000.push(p);
+	}
+	log(...under20000);
+
+	// filter 함수 이용
+	log(...filter((p) => p.price < 20000, products));
+
+	/* 20000원 이상인 가격 조건을 가진 것만 추출하여 새로운 배열 만들기 */
+	// 기존
+	let over20000 = [];
+	for (const p of products) {
+		if (p.price >= 20000) over20000.push(p);
+	}
+	log(...over20000);
+
+	// filter 함수 이용
+	log(...filter((p) => p.price >= 20000, products));
+
+	// 다음과 같이 Array 및 제너레이터에 응용될 수 있음
+	log(filter((n) => n % 2, [1, 2, 3, 4]));
+
+	log(
+		filter(
+			(n) => n % 2,
+			(function* () {
+				yield 1;
+				yield 2;
+				yield 3;
+				yield 4;
+				yield 5;
+			})()
+		)
+	);
+</script>
