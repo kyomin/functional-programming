@@ -43,3 +43,39 @@
 	// map 함수 이용
 	log(map((p) => p.price, products));
 </script>
+
+<!-- 이터러블 프로토콜을 따른 map의 다형성 -->
+<script>
+	// Error!
+	// NodeList 객체에는 map 함수가 구현되어 있지 않기 때문이다.
+	// log(document.querySelectorAll('*').map((el) => el.nodeName));
+
+	// 하지만 위에서 우리가 정의한 map 함수로는 동작이 잘 된다.
+	// 왜냐하면 NodeList 객체는 이터러블 프로토콜을 따르고 있기 때문이다.
+	log(map((el) => el.nodeName, document.querySelectorAll('*')));
+	const it = document.querySelectorAll('*')[Symbol.iterator]();
+	log(it.next());
+	log(it.next());
+	log(it.next());
+	log(it.next());
+	log(it.next());
+
+	// 제너레이터도 이터레이터이기 때문에 우리가 정의한 map 함수에서 잘 동작한다.
+	function* gen() {
+		yield 2;
+		yield 3;
+		yield 4;
+	}
+	log(map((a) => a * a, gen()));
+
+	let m = new Map();
+	m.set('a', 10);
+	m.set('b', 20);
+	const it2 = m[Symbol.iterator]();
+	log(it2.next());
+	log(it2.next());
+	log(it2.next());
+
+	// Map 자료구조는 value가 배열이기 때문에 구조분해로 넘길 수 있다.
+	log(new Map(map(([k, v]) => [k, v * 2], m)));
+</script>
