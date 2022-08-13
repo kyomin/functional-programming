@@ -128,3 +128,32 @@
 		)
 	);
 </script>
+
+<!-- reduce -->
+<script>
+	const nums = [1, 2, 3, 4, 5];
+
+	// acc에 값을 누적해 나가며, 누적 기준은 f에 위임한다.
+	const reduce = (f, acc, iter) => {
+		// acc를 사용자가 넘기지 않았을 때의 처리
+		if (!iter) {
+			iter = acc[Symbol.iterator]();
+			acc = iter.next().value;
+		}
+
+		for (const a of iter) {
+			acc = f(acc, a);
+		}
+		return acc;
+	};
+
+	const add = (a, b) => a + b;
+	log(reduce(add, 0, nums));
+	log(reduce(add, nums));
+</script>
+<script>
+	// 위에서 정의한 redece를 products 배열에 응용
+	log(
+		reduce((total_price, product) => total_price + product.price, 0, products)
+	);
+</script>
