@@ -1,0 +1,45 @@
+<script>
+	const log = console.log;
+</script>
+<script>
+	const products = [
+		{ name: '반팔티', price: 15000 },
+		{ name: '긴팔티', price: 20000 },
+		{ name: '핸드폰케이스', price: 15000 },
+		{ name: '후드티', price: 30000 },
+		{ name: '바지', price: 25000 },
+	];
+</script>
+
+<!-- map -->
+<script>
+	const map = (f, iter) => {
+		let res = [];
+		for (const a of iter) {
+			res.push(f(a));
+		}
+		return res;
+	};
+
+	/* name 속성만을 추출하여 새로운 배열 만들기 */
+	// 기존
+	let names = [];
+	for (const p of products) {
+		names.push(p.name);
+	}
+	log(names);
+
+	// map 함수 이용
+	log(map((p) => p.name, products));
+
+	/* price 속성만을 추출하여 새로운 배열 만들기 */
+	// 기존
+	let prices = [];
+	for (const p of products) {
+		prices.push(p.price);
+	}
+	log(prices);
+
+	// map 함수 이용
+	log(map((p) => p.price, products));
+</script>
