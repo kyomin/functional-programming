@@ -53,9 +53,20 @@
 	// 위에서부터 아래로 의도를 쉽게 읽을 수 있게 되었다.
 	go(
 		products,
-		(products) => filter((p) => p.price < 20000, products),
-		(products) => map((p) => p.price, products),
-		(prices) => reduce(add, prices),
+		filter((p) => p.price < 20000),
+		map((p) => p.price),
+		reduce(add),
 		log
 	);
+</script>
+
+<!-- curry -->
+<script>
+	const mult = curry((a, b) => a * b);
+	log(mult(2)(3));
+
+	const mult3 = mult(3);
+	log(mult3(10));
+	log(mult3(5));
+	log(mult3(3));
 </script>
