@@ -1,14 +1,7 @@
 <script src="../lib/fx.js"></script>
 
-<!-- range -->
-<!--  
-range를 호출하기만 하면 배열 값이 평가된다.
-그 후, 평가된 배열을 순회하며 사용자 연산을 진행한다.
-순회가 2번 이뤄진다.
--->
+<!-- range, map, filter, take, reduce 중첩 사용 -->
 <script>
-	const add = (a, b) => a + b;
-
 	const range = (l) => {
 		let i = -1;
 		let res = [];
@@ -18,18 +11,30 @@ range를 호출하기만 하면 배열 값이 평가된다.
 		return res;
 	};
 
-	var list = range(4);
-	log(list);
-	// log(reduce(add, list));
-</script>
+	const take = curry((l, iter) => {
+		let res = [];
+		// for .. of 대체 코드 => 디버깅을 위함
+		iter = iter[Symbol.iterator]();
+		let cur;
+		while (!(cur = iter.next()).done) {
+			const a = cur.value;
+			res.push(a);
+			if (res.length === l) return res;
+		}
 
-<!-- 느긋한 L.range -->
-<!--  
-제너레이터로 구현했기 때문에,
-next() 함수를 호출하지 않는 이상 yield 부분으로 빠지지 않는다.
-즉, 미리 평가된 값을 가지고서가 아니라 순회를 하면서 사용자 연산을 진행한다.
-때문에, range보다 성능이 더 좋다.
--->
+		return res;
+	});
+
+	go(
+		range(10),
+		map((n) => n + 10),
+		filter((n) => n % 2),
+		take(2),
+		log
+	);
+</script> 
+
+<!-- L.range, L.map, L.filter, take, reduce 중첩 사용 -->
 <script>
 	const L = {};
 	L.range = function* (l) {
@@ -39,66 +44,29 @@ next() 함수를 호출하지 않는 이상 yield 부분으로 빠지지 않는�
 		}
 	};
 
-	var list = L.range(4);
-	log(list);
-	// log(reduce(add, list));
-</script>
-
-<!-- range와 느긋한 L.range 테스트 -->
-<script>
-	function test(name, time, f) {
-		console.time(name);
-		while (time--) f();
-		console.timeEnd(name);
-	}
-
-	// test('range', 10, () => reduce(add, range(1000000)));
-	// test('L.range', 10, () => reduce(add, L.range(1000000)));
-</script>
-
-<!-- take -->
-<script>
-	const take = curry((l, iter) => {
-		let res = [];
-		for (const a of iter) {
-			res.push(a);
-			if (res.length === l) return res;
+	L.map = curry(function* (f, iter) {
+		iter = iter[Symbol.iterator]();
+		let cur;
+		while (!(cur = iter.next()).done) {
+			const a = cur.value;
+			yield f(a);
 		}
-		return res;
 	});
-	console.time('range');
-	// 10000 순회하여 배열 평가가 완료된 후에 5회 순회
-	go(range(10000), take(5), reduce(add), log);
-	console.timeEnd('range');
 
-	console.time('L.range');
-	// 바로 5회 순회
-	go(L.range(10000), take(5), reduce(add), log);
-	console.timeEnd('L.range');
-</script>
+	L.filter = curry(function* (f, iter) {
+		iter = iter[Symbol.iterator]();
+		let cur;
+		while (!(cur = iter.next()).done) {
+			const a = cur.value;
+			if (f(a)) yield a;
+		}
+	});
 
-<!-- 
-# 이터러블 중심 프로그래밍에서의 지연 평가 (Lazy Evaluation)
-  - 제때 계산법
-  - 느긋한 계산법
-  - 제너레이터/이터레이터 프로토콜을 기반으로 구현
--->
-<!-- L.map -->
-<script>
-	L.map = function* (f, iter) {
-		for (const a of iter) yield f(a);
-	};
-	// var it = L.map((a) => a + 10, [1, 2, 3]);
-	// log(it.next());
-</script>
-
-<!-- L.filter -->
-<script>
-	L.filter = function* (f, iter) {
-		for (const a of iter) if (f(a)) yield a;
-	};
-	var it = L.filter((a) => a % 2, [1, 2, 3, 4]);
-	log(it.next());
-	log(it.next());
-	log(it.next());
+	// go(
+	// 	L.range(10),
+	// 	L.map((n) => n + 10),
+	// 	L.filter((n) => n % 2),
+	// 	take(2),
+	// 	log
+	// );
 </script>
