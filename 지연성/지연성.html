@@ -1,6 +1,11 @@
 <script src="../lib/fx.js"></script>
 
 <!-- range -->
+<!--  
+range를 호출하기만 하면 배열 값이 평가된다.
+그 후, 평가된 배열을 순회하며 사용자 연산을 진행한다.
+순회가 2번 이뤄진다.
+-->
 <script>
 	const add = (a, b) => a + b;
 
@@ -19,6 +24,12 @@
 </script>
 
 <!-- 느긋한 L.range -->
+<!--  
+제너레이터로 구현했기 때문에,
+next() 함수를 호출하지 않는 이상 yield 부분으로 빠지지 않는다.
+즉, 미리 평가된 값을 가지고서가 아니라 순회를 하면서 사용자 연산을 진행한다.
+때문에, range보다 성능이 더 좋다.
+-->
 <script>
 	const L = {};
 	L.range = function* (l) {
@@ -41,6 +52,27 @@
 		console.timeEnd(name);
 	}
 
-	test('range', 10, () => reduce(add, range(1000000)));
-	test('L.range', 10, () => reduce(add, L.range(1000000)));
+	// test('range', 10, () => reduce(add, range(1000000)));
+	// test('L.range', 10, () => reduce(add, L.range(1000000)));
+</script>
+
+<!-- take -->
+<script>
+	const take = curry((l, iter) => {
+		let res = [];
+		for (const a of iter) {
+			res.push(a);
+			if (res.length === l) return res;
+		}
+		return res;
+	});
+	console.time('range');
+	// 10000 순회하여 배열 평가가 완료된 후에 5회 순회
+	go(range(10000), take(5), reduce(add), log);
+	console.timeEnd('range');
+
+	console.time('L.range');
+	// 바로 5회 순회
+	go(L.range(10000), take(5), reduce(add), log);
+	console.timeEnd('L.range');
 </script>
